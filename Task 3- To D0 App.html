@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO DO APP</title>
+</head>
+<style>
+  body {
+    background-color: rgb(45, 46, 46) !important;
+    background-image: url("https://img.freepik.com/premium-photo/abstract-empty-smooth-light-pink-studio-room-background-use-as-montage-product-display-banner-template_1258-71093.jpg");
+  }
+  
+  #todoList label {
+    width: 80%;
+  }
+  
+  #todoList li {
+    list-style-type: none;
+  }
+  
+  .uncompleted label {
+    color: #afa7a7;
+    text-decoration: line-through;
+  }
+  
+  #todoList .btn {
+    margin-left: 10px;
+  }
+  
+  .lineOver {
+    text-decoration: line-through;
+    text-decoration-color: red;
+  } 
+</style>
+</head>
+
+<body>
+ <!-- Bootstrap -->
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+ integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+<!--  -->
+
+<body>
+
+<div class="container mt-4">
+ <div class="row">
+
+   <h1 class="fw-bold text-center text-light fst-italic" style="text-shadow: 3px 3px 1px #ccc;"><span
+       class="text-success">T</span>odo
+     <span class="text-success">L</span>ist <span class="text-success">A</span>pp
+   </h1>
+
+   <div class="col mt-4">
+     <section>
+
+       <div class="input-group">
+         <i class="input-group-text bi bi-clipboard2-plus fs-2 text-primary bg-transparent border-primary"></i>
+         <div class="form-floating">
+           <input type="text" placeholder="Add New Todo" id="inputElemTodo"
+             class="form-control text-light bg-transparent border-primary">
+           <label for="inputElemTodo" class="text-light fst-italic">Add New Todo</label>
+         </div>
+       </div>
+
+       <div class="btn-group mt-3">
+         <div id="addTodoBtn" class="btn btn-success fst-italic">Add To List</div>
+         <div id="clearTodoBtn" class="btn btn-danger fst-italic">Clear Todo List</div>
+       </div>
+
+     </section>
+
+     <small id="alert"></small>
+   </div>
+ </div>
+
+ <div class="row mt-5">
+   <div class="col">
+     <h3 class="fw-bolder h4 text-light text-center fst-italic" style="text-shadow: 2px 2px 1px #ccc;"><span
+         class="text-success">T</span>odo <span class="text-success">L</span>ist</h3>
+     <div id="mainTodos" class="mt-3"></div>
+   </div>
+ </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+ integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+ crossorigin="anonymous"></script>
+
+<script>
+  let $ = document
+
+  let inputElemTodo = $.getElementById("inputElemTodo")
+  let divElemMain = $.getElementById('mainTodos')
+  let addTodoBtn = $.getElementById("addTodoBtn")
+  let clearTodoBtn = $.getElementById("clearTodoBtn")
+  let alert = $.getElementById('alert')
+  
+  let todosArray = []
+  
+  
+  function addTodo() {
+  
+      if (inputElemTodo.value.length < 2) {
+          alert.innerHTML = "Empety !"
+          alert.className = 'text-danger'
+      }
+      else {
+  
+          alert.innerHTML = "Looks good! "
+          alert.className = 'text-success'
+  
+          let valueInput = inputElemTodo.value
+  
+          let newTodoObj = {
+              id: todosArray.length + 1,
+              title: valueInput,
+              complete: false
+          }
+          ///
+          inputElemTodo.value = ''
+          ///
+          todosArray.push(newTodoObj)
+          setLocalStorage(todosArray)
+          todosGenerator(todosArray)
+      }
+  
+  }
+  
+  function setLocalStorage(todosList) {
+      localStorage.setItem('todos', JSON.stringify(todosList))
+  }
+  
+  function todosGenerator(todosList) {
+      ///bi bi-journal-check fs-4      bi bi-journal-x fs-4
+      let newTodoTitle, newTodoCompleteBtn, newTodoDeleteBtn
+  
+      ///
+      divElemMain.innerHTML = ''
+      todosList.forEach(function (todo) {
+          ///Btn Delet And Complete
+          newTodoCompleteBtn = $.createElement('i')
+          newTodoCompleteBtn.className = 'btn btn-outline-success '
+          newTodoCompleteBtn.innerHTML = 'Complete'
+  
+          newTodoCompleteBtn.setAttribute('onclick', 'editTodo(' + todo.id + ')')
+          //
+          newTodoDeleteBtn = $.createElement('i')
+          newTodoDeleteBtn.className = 'btn btn-outline-danger'
+          newTodoDeleteBtn.innerHTML = 'Delete'
+  
+          newTodoDeleteBtn.setAttribute('onclick', "removeTodo(" + todo.id + ")")
+  
+          /// Div Buttons
+          let divElemBtns = $.createElement('div')
+          divElemBtns.className = 'btn-group'
+          divElemBtns.append(newTodoCompleteBtn, newTodoDeleteBtn)
+  
+          /// Title Todo
+          newTodoTitle = $.createElement('p')
+          newTodoTitle.className = 'card-title text-light h5 mb-0 bg-dark py-2 px-3 me-3 rounded overflow-auto fst-italic'
+          newTodoTitle.innerHTML = todo.title
+  
+          /// Div Card Hold  //Title Todo//  And  //Btn Delet//  And  //Btn Complete//
+          let divCard = $.createElement('div')
+          divCard.className = 'd-flex align-items-center justify-content-between'
+          divCard.append(newTodoTitle, divElemBtns)
+  
+          /// Hold Div Card
+          let sectionElem = $.createElement('section')
+          sectionElem.className = 'card card-body bg-transparent border-success mt-2'
+          sectionElem.append(divCard)
+  
+          if (todo.complete) {
+              newTodoCompleteBtn.innerHTML = 'UnComplete'
+              newTodoTitle.style.textDecoration = 'line-through'
+          }
+  
+          /// Hold Main
+          divElemMain.append(sectionElem)
+      })
+  }
+  
+  //editTodos
+  function editTodo(todoId) {
+  
+      let localStorageTodos = JSON.parse(localStorage.getItem('todos'))
+  
+      todosArray.forEach(function (todo) {
+          if (todo.id === todoId) {
+              todo.complete = !todo.complete
+          }
+  
+      })
+  
+      setLocalStorage(todosArray)
+      todosGenerator(todosArray)
+  
+  }
+  
+  //clearBtn
+  function removeTodo(todoId) {
+      console.log(todoId);
+  
+      let localStorageTodos = JSON.parse(localStorage.getItem('todos'))
+  
+      let mainTodoIndex = localStorageTodos.findIndex(function (todo) {
+          return todo.id === todoId
+      })
+      console.log(mainTodoIndex);
+  
+      todosArray.splice(mainTodoIndex, 1)
+  
+      setLocalStorage(todosArray)
+  
+      todosGenerator(todosArray)
+  }
+  
+  
+  function getLocalStorage() {
+  
+      let localStorageTodos = JSON.parse(localStorage.getItem('todos'))
+  
+      if (localStorageTodos) {
+          todosArray = localStorageTodos
+      } else {
+          todosArray = []
+      }
+      todosGenerator(todosArray)
+  
+  }
+  
+  function clearTodos() {
+      todosArray = []
+      todosGenerator(todosArray)
+      localStorage.removeItem('todos')
+  
+  }
+  
+  //|||||||||||||||||||  Events  |||||||||||||||||||\\
+  window.addEventListener('load', getLocalStorage)
+  addTodoBtn.addEventListener('click', addTodo)
+  clearTodoBtn.addEventListener('click', clearTodos)
+  inputElemTodo.addEventListener('keydown', function (event) {
+      if (event.code === 'Enter') {
+          addTodo()
+      }
+  })
+</script>
+</body>
+</html>
